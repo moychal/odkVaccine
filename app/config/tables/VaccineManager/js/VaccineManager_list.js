@@ -1,31 +1,80 @@
 /**
  * This is the file that will be creating the list view.
  */
-/* global $, control, data */
+/* global $, odkTables */
 'use strict';
 
-if (JSON.parse(control.getPlatformInfo()).container === 'Chrome') {
-    console.log('Welcome to Tables debugging in Chrome!');
-    $.ajax({
-        url: control.getFileAsUrl('output/debug/VaccineManager_data.json'),
-        async: false,  // do it first
-        success: function(dataObj) {
-            if (dataObj === undefined || dataObj === null) {
-                console.log('Could not load data json for table: VaccineManager');
-            }
-            window.data.setBackingObject(dataObj);
-        }
-    });
-}
+// if (JSON.parse(odkCommon.getPlatformInfo()).container === 'Chrome') {
+//     console.log('Welcome to Tables debugging in Chrome!');
+//     $.ajax({
+//         url: odkCommon.getFileAsUrl('output/debug/plot_data.json'),
+//         async: false,  // do it first
+//         success: function(dataObj) {
+//             if (dataObj === undefined || dataObj === null) {
+//                 console.log('Could not load data json for table: plot');
+//             }
+//             window.data.setBackingObject(dataObj);
+//         }
+//     });
+// }
 
 // Use chunked list view for larger tables: We want to chunk the displays so
 // that there is less load time.
-            
+var plotResultSet = {};   
+var idxStart = -1;
+    
+function cbSuccess(result) {
+    plotResultSet = result;
+
+    
+    return (function() {
+        displayGroup(idxStart);
+    }());
+}
+
+function cbFailure(error) {
+
+    console.log('plot_list: cbFailure failed with error: ' + error);
+}
+     
 /**
  * Called when page loads. idxStart is the index of the row that should be
  * displayed at this iteration through the loop.
  */
-var resumeFn = function(idxStart) {
+var resumeFn = function(fidxStart) {
+    odkData.getViewData(cbSuccess, cbFailure);
+
+    idxStart = fidxStart;
+    if (idxStart === 0) {
+        // We want to be able to drag and drop without the drop triggering a click.
+        // Idea for this taken from:
+        // http://stackoverflow.com/questions/14301026/how-do-i-avoid-a-click-event-firing-after-dragging-a-gridster-js-widget-with-cli
+
+        var preventClick = function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+        };
+
+        $('.gridster ul').gridster({
+            widget_margins: [10, 10],
+            widget_base_dimensions: [140, 140],
+            draggable: {
+                start: function(event, ui) {
+                    // stop propagating in the capture phase.
+                    ui.$player[0].addEventListener('click', preventClick, true);
+                },
+                stop: function(event, ui) {
+                    var player = ui.$player;
+                    setTimeout(function() {
+                        player[0].removeEventListener(
+                          'click',
+                          preventClick,
+                          true);
+                    });
+                }
+            }
+        });
+    }
 
     console.log('resumeFn called. idxStart: ' + idxStart);
     // The first time through construct any constants you need to refer to
@@ -34,7 +83,7 @@ var resumeFn = function(idxStart) {
         // This add a click handler on the wrapper ul that will handle all of
         // the clicks on its children.
         $('#list').click(function(e) {
-            var tableId = data.getTableId();
+            var tableId = plotResultSet.getTableId();
             // We have set the rowId while as the li id. However, we may have
             // clicked on the li or anything in the li. Thus we need to get
             // the original li, which we'll do with jQuery's closest()
@@ -47,17 +96,17 @@ var resumeFn = function(idxStart) {
             var containingDiv = jqueryObject.closest('.item_space');
             var rowId = containingDiv.attr('rowId');
             console.log('clicked with rowId: ' + rowId);
-            // make sure we retrieved the rowId
+          // make sure we retrieved the rowId
             if (rowId !== null && rowId !== undefined) {
                 // we'll pass null as the relative path to use the default file
-                control.openDetailView(tableId, rowId, null);
+                odkTables.openDetailView(
+                    tableId,
+                    rowId,
+                    'config/tables/plot/html/plot_detail.html');
             }
         });
     }
-    
-    return (function() {
-        displayGroup(idxStart);
-    }());
+
 };
             
 /**
@@ -68,10 +117,13 @@ var resumeFn = function(idxStart) {
  * a detail view on the clicked row.
  */
 var displayGroup = function(idxStart) {
+    var gridster = $('.gridster ul').gridster().data('gridster');
+
     // Number of rows displayed per chunk
     var chunk = 50;
+
     for (var i = idxStart; i < idxStart + chunk; i++) {
-        if (i >= data.getCount()) {
+        if (i >= plotResultSet.getCount()) {
             break;
         }
 
@@ -79,21 +131,32 @@ var displayGroup = function(idxStart) {
         // an attribute so that the click handler set in resumeFn knows which
         // row was clicked.
         var item = $('<li>');
-        item.attr('rowId', data.getRowId(i));
+
+        var containerDiv = $('<div>');
+        containerDiv.text(plotResultSet.getData(i, 'plot_name'));
+        containerDiv.addClass('content-holder');
+
+        item.attr('rowId', plotResultSet.getRowId(i));
         item.attr('class', 'item_space');
-        item.text(data.getData(i, 'Name'));
+        item.addClass('grid-item');
+
+        item.append(containerDiv);
                 
         /* Creates arrow icon (Nothing to edit here) */
-        var chevron = $('<img>');
-        chevron.attr('src', control.getFileAsUrl('assets/img/little_arrow.png'));
-        chevron.attr('class', 'chevron');
-        item.append(chevron);
+        //var chevron = $('<img>');
+        //chevron.attr('src', odkTables.getFileAsUrl('config/assets/img/little_arrow.png'));
+        //chevron.attr('class', 'chevron');
+        //item.append(chevron);
 
-        // Add any other details in your list item here.
-                
-        $('#list').append(item);
+        var idItem = $('<div>');
+        idItem.attr('class', 'detail');
+        idItem.text('Crop: ' + plotResultSet.getData(i, 'planting'));
+        containerDiv.append(idItem);
+
+        gridster.add_widget(item, 1, 1);
+        
     }
-    if (i < data.getCount()) {
+    if (i < plotResultSet.getCount()) {
         setTimeout(resumeFn, 0, i);
     }
 };
