@@ -389,8 +389,20 @@
         "_row_num": 72
       },
       {
-        "clause": "exit section",
+        "branch_label": "VaccineManager",
         "_row_num": 73
+      },
+      {
+        "url": "'?' + opendatakit.getHashString('../config/tables/VaccineManager/forms/VaccineManager/',null)",
+        "type": "external_link",
+        "display": {
+          "text": "Open form"
+        },
+        "_row_num": 74
+      },
+      {
+        "clause": "exit section",
+        "_row_num": 75
       }
     ],
     "settings": [
@@ -597,6 +609,14 @@
           "text": "DateTime Picker"
         },
         "_row_num": 23
+      },
+      {
+        "choice_list_name": "test_forms",
+        "data_value": "VaccineManager",
+        "display": {
+          "text": "VaccineManager"
+        },
+        "_row_num": 24
       }
     ]
   },
@@ -849,6 +869,14 @@
             "text": "DateTime Picker"
           },
           "_row_num": 23
+        },
+        {
+          "choice_list_name": "test_forms",
+          "data_value": "VaccineManager",
+          "display": {
+            "text": "VaccineManager"
+          },
+          "_row_num": 24
         }
       ]
     },
@@ -1275,12 +1303,25 @@
             "promptIdx": 23
           },
           {
+            "url": "'?' + opendatakit.getHashString('../config/tables/VaccineManager/forms/VaccineManager/',null)",
+            "type": "external_link",
+            "display": {
+              "text": "Open form"
+            },
+            "_row_num": 74,
+            "__rowNum__": 73,
+            "_token_type": "prompt",
+            "_type": "external_link",
+            "_branch_label_enclosing_screen": "survey/_screen74",
+            "promptIdx": 24
+          },
+          {
             "_token_type": "prompt",
             "type": "contents",
             "_type": "contents",
-            "_row_num": 74,
-            "_branch_label_enclosing_screen": "survey/_screen74",
-            "promptIdx": 24
+            "_row_num": 76,
+            "_branch_label_enclosing_screen": "survey/_screen76",
+            "promptIdx": 25
           }
         ],
         "validation_tag_map": {
@@ -1609,32 +1650,38 @@
             "operationIdx": 48
           },
           {
-            "clause": "exit section",
-            "_row_num": 73,
-            "__rowNum__": 72,
-            "_token_type": "exit_section",
-            "operationIdx": 49
-          },
-          {
-            "_token_type": "exit_section",
-            "clause": "exit section",
-            "_row_num": 74,
-            "operationIdx": 50
-          },
-          {
             "_row_num": 74,
             "_token_type": "begin_screen",
             "_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(24);\n\nreturn activePromptIndicies;\n}\n",
+            "operationIdx": 49
+          },
+          {
+            "clause": "exit section",
+            "_row_num": 75,
+            "__rowNum__": 74,
+            "_token_type": "exit_section",
+            "operationIdx": 50
+          },
+          {
+            "_token_type": "exit_section",
+            "clause": "exit section",
+            "_row_num": 76,
+            "operationIdx": 51
+          },
+          {
+            "_row_num": 76,
+            "_token_type": "begin_screen",
+            "_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(25);\n\nreturn activePromptIndicies;\n}\n",
             "screen": {
               "hideInBackHistory": true
             },
-            "operationIdx": 51
+            "operationIdx": 52
           },
           {
             "_token_type": "resume",
             "clause": "resume",
-            "_row_num": 74,
-            "operationIdx": 52
+            "_row_num": 76,
+            "operationIdx": 53
           }
         ],
         "branch_label_map": {
@@ -1687,8 +1734,10 @@
           "_screen69": 46,
           "eonasdan": 48,
           "_screen72": 48,
-          "_contents": 51,
-          "_screen74": 51
+          "VaccineManager": 49,
+          "_screen74": 49,
+          "_contents": 52,
+          "_screen76": 52
         }
       }
     },
